@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import SessionAuthProvider from "./context/session.auth.provider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -14,7 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="dark:bg-white bg-white">{children}</body>
+      <SessionAuthProvider>
+        <body className="dark:bg-white bg-white">{children}</body>
+      </SessionAuthProvider>
     </html>
   );
 }
