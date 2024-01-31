@@ -1,5 +1,7 @@
 "use client";
 
+import { signIn, useSession } from "next-auth/react";
+import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 
 function Login() {
@@ -8,9 +10,21 @@ function Login() {
     password: "",
   });
 
-  function handleSubmit(e: Event) {
+  const router = useRouter();
+
+  async function handleSubmit(e: any) {
     e.preventDefault();
+
+    const res = await signIn("credentials", {
+      dni: data.dni,
+      password: data.password,
+      redirect: false,
+    });
+
+    if (res?.ok) router.push("/system");
+    else alert("Credemciales incorrectas");
   }
+
   return (
     <section className="w-[20rem] mt-12">
       <h1 className="font-semibold text-2xl text-center">
@@ -18,7 +32,7 @@ function Login() {
       </h1>
       <form
         className="flex flex-col shadow-lg rounded-lg p-4 mt-8"
-        onSubmit={(e) => handleSubmit}
+        onSubmit={handleSubmit}
       >
         <div className="flex flex-col">
           <label htmlFor="" className="text-slate-700 font-semibold">

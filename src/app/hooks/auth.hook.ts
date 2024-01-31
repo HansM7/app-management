@@ -4,8 +4,6 @@ import { authService } from "@/lib/services/auth.service";
 export async function authenticate(dni: string, password: string) {
   const response = await authService.login({ dni, password });
 
-  // esto es para el login XD
-
   if (response.response.ok) {
     const user = {
       id: response.response.data.id,

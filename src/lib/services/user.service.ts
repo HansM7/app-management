@@ -19,7 +19,7 @@ connectionToDatabase();
 class UserService {
   async findUsers() {
     try {
-      const users = await userSchema.find();
+      const users = await userSchema.find({}, "-password");
       return httpService.http200("All users", users);
     } catch (error) {
       return httpService.http500(undefined, error);
@@ -38,7 +38,6 @@ class UserService {
       await userSchema.create(newFormat);
       return httpService.http201("User created!");
     } catch (error) {
-      console.log(error);
       return httpService.http500(undefined, error);
     }
   }
@@ -53,8 +52,8 @@ class UserService {
   async deleteUser(uuid: string, infoAdmin: infoAdmin) {
     try {
       // Validamos al administrador
-      const res_validate = await adminService.validateAdmin(infoAdmin);
-      if (!res_validate.response.ok) return res_validate;
+      // const res_validate = await adminService.validateAdmin(infoAdmin);
+      // if (!res_validate.response.ok) return res_validate;
       // Buscamos al usuario a eliminar
       const res_delete = await this.findUsersByUUID(uuid);
       if (!res_delete.response.ok) return res_delete;
@@ -68,7 +67,7 @@ class UserService {
 
   async findUsersByDni(dni: string) {
     try {
-      const user = await userSchema.find({ dni: dni });
+      const user = await userSchema.findOne({ dni: dni });
       if (user) return httpService.http200("User found", user);
       return httpService.http404("User not found");
     } catch (error) {

@@ -1,19 +1,16 @@
-// import { authOptions } from "@/app/auth.config";
-// import NextAuth from "next-auth";
-
-// const handler = NextAuth(authOptions);
-// export { handler as GET, handler as POST };
-
 import { authenticate } from "@/app/hooks/auth.hook";
-import NextAuth from "next-auth";
+import NextAuth, { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-const handler = NextAuth({
+export const authOptions: AuthOptions = {
+  session: {
+    strategy: "jwt",
+  },
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        username: {
+        dni: {
           label: "dni",
           type: "string",
         },
@@ -24,24 +21,32 @@ const handler = NextAuth({
           credentials?.dni,
           credentials?.password
         );
-
-        return user ? user : null;
+        return user as { id: string; name: string; role: string };
       },
     }),
   ],
+  secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    async jwt({ token, user }) {
-      return { ...token, ...user };
-    },
-    async session({ session, token }) {
-      console.log(token);
-      session.user = token as any;
+    async session({ session, token }: any) {
+      if (token && token.user) {
+        session.user = token.user;
+      }
       return session;
     },
+    async jwt({ token, user }: any) {
+      if (!token.user) {
+        token.user = {};
+      }
+      if (user) {
+        token.user.id = user.id;
+        token.user.name = user.name;
+        token.user.role = user.role;
+      }
+      return token;
+    },
   },
-  pages: {
-    signIn: "/login",
-  },
-});
+};
+
+export const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

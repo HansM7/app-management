@@ -10,7 +10,6 @@ export default function ActiveLink({
   href: string;
   children: ReactNode;
 }) {
-  console.log(href);
   const pathname = usePathname();
 
   return (

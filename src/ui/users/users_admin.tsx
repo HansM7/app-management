@@ -4,23 +4,45 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import ModalDelete from "./modal_delete";
 import axios from "axios";
+import ModalEdit from "./modal_edit";
+import { useSession } from "next-auth/react";
+import { useHookUsersAdmin } from "./hook";
 
 function UsersAdmin() {
-  const [openModal, setOpenModal] = useState(false);
-  const [isFetching, setIsFetching] = useState(true);
+  const { data: session, status } = useSession();
 
-  const [users, setUsers] = useState([]);
+  // const [openModal, setOpenModal] = useState(false);
+  // const [openModalEdit, setOpenModalEdit] = useState(false);
+  // const [userSelected, setUserSelected] = useState({});
+  // const [isFetching, setIsFetching] = useState(true);
+  // const [users, setUsers] = useState([]);
 
-  const changeModal = () => {
-    setOpenModal(!openModal);
-  };
+  // const changeModalDelete = (user: any) => {
+  //   setUserSelected(user);
+  //   setOpenModal(!openModal);
+  // };
 
-  async function fetchUsers() {
-    const response = await axios.get("/api/users");
-    console.log(response);
-    setUsers(response.data.data);
-    setIsFetching(false);
-  }
+  // const changeModalEdit = (user: any) => {
+  //   setUserSelected(user);
+  //   setOpenModalEdit(!openModalEdit);
+  // };
+
+  // async function fetchUsers() {
+  //   const response = await axios.get("/api/users");
+  //   setUsers(response.data.data);
+  //   setIsFetching(false);
+  // }
+
+  const {
+    openModal,
+    openModalEdit,
+    userSelected,
+    isFetching,
+    users,
+    changeModalDelete,
+    changeModalEdit,
+    fetchUsers,
+  } = useHookUsersAdmin();
 
   useEffect(() => {
     fetchUsers();
@@ -60,12 +82,15 @@ function UsersAdmin() {
                     Nombres
                   </th>
                   <th scope="col" className="px-6 py-3">
+                    Rol
+                  </th>
+                  <th scope="col" className="px-6 py-3">
                     DNI
                   </th>
                   <th scope="col" className="px-6 py-3">
                     Estado
                   </th>
-                  <th scope="col" className="px-6 py-3">
+                  <th scope="col" className="px-6 py-3" colSpan={2}>
                     Acciones
                   </th>
                 </tr>
@@ -79,16 +104,23 @@ function UsersAdmin() {
                   users.map((user: any, index) => (
                     <tr key={index}>
                       <td className="px-6 py-4">{user.name}</td>
+                      <td className="px-6 py-4">{user.role}</td>
                       <td className="px-6 py-4">{user.dni}</td>
                       <td className="px-6 py-4">
                         {user.active ? "ACTIVO" : "INHABILITADO"}
                       </td>
-                      <td>
+                      <td className="px-6">
                         <button
-                          onClick={changeModal}
+                          onClick={() => changeModalDelete(user)}
                           className="px-2 py-1 bg-red-600 text-white rounded-md "
                         >
-                          Eliminar usuario
+                          Eliminar
+                        </button>
+                        <button
+                          onClick={() => changeModalEdit(user)}
+                          className="px-2 py-1 bg-green-600 text-white rounded-md ml-4"
+                        >
+                          Editar
                         </button>
                       </td>
                     </tr>
@@ -103,9 +135,16 @@ function UsersAdmin() {
       {/* modal */}
 
       <ModalDelete
+        user={userSelected}
         openModal={openModal}
-        changeModal={changeModal}
+        changeModal={changeModalDelete}
       ></ModalDelete>
+
+      <ModalEdit
+        user={userSelected}
+        openModal={openModalEdit}
+        changeModal={changeModalEdit}
+      ></ModalEdit>
     </main>
   );
 }

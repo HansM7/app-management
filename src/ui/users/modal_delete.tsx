@@ -14,6 +14,7 @@ function ModalDelete({
   return (
     <>
       <Modal
+        ariaHideApp={false}
         isOpen={openModal}
         style={{
           overlay: {
