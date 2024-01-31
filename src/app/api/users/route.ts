@@ -9,6 +9,8 @@ export async function GET(req: Request) {
 export async function POST(request: Request) {
   const data = await request.json();
 
+  console.log(data);
+
   const response = await userService.createUser(data.body, data.validation);
 
   return NextResponse.json(response.response, { status: response.code });

@@ -1,5 +1,5 @@
 import { userService } from "@/lib/services/user.service";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 type body = {
   action: string;
@@ -13,11 +13,19 @@ type body = {
 export async function POST(request: NextRequest) {
   const data: body = await request.json();
   const action = data.action;
+  let response;
   if (action === "delete") {
-    await userService.deleteUser(data.payload.user_deleted_id, data.infoAdmin);
+    response = await userService.deleteUser(
+      data.payload.user_deleted_id,
+      data.infoAdmin
+    );
   } else if (action === "edit") {
-    await userService.editUser(data.payload, data.infoAdmin);
+    response = await userService.editUser(data.payload, data.infoAdmin);
   }
+
+  console.log(response);
+
+  return NextResponse.json(response?.response, { status: response?.code });
 }
 
 // entendemos que del form llegara esta inforrmacion

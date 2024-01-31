@@ -11,7 +11,14 @@ export default async function middleware(request: NextRequest) {
     : "__Secure-next-auth.session-token";
   let cookie = request.cookies.get(keyToken)?.value;
   const secret = process.env.NEXTAUTH_SECRET || "default-secret";
-  const user = await decode({ token: cookie, secret });
+  const user: any = await decode({ token: cookie, secret });
+
+  // user: {
+  //   user:{
+  //     role,
+  //     name
+  //   }
+  // }
 
   if (pathname.startsWith("/system")) {
     if (user === null) {
@@ -19,8 +26,10 @@ export default async function middleware(request: NextRequest) {
     }
   }
 
-  if (pathname === "/system/users/create") {
-    if (user?.role !== "admin") return return401();
+  if (pathname.startsWith("/system/users/create")) {
+    if (user?.user.role !== "admin") {
+      return return401();
+    }
   }
 
   function return401() {

@@ -6,10 +6,12 @@ function ModalEdit({
   user,
   openModal,
   changeModal,
+  setIsfetch,
 }: {
   user: any;
   openModal: boolean;
   changeModal: any;
+  setIsfetch: any;
 }) {
   const [data, setData] = useState({
     name: "",

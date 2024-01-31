@@ -3,7 +3,8 @@ import { v4 as uuid } from "uuid";
 const userSchema = new mongoose.Schema({
   id: {
     type: String,
-    default: uuid(),
+    default: () => uuid(),
+    unique: true,
   },
   name: {
     type: String,

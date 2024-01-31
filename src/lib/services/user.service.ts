@@ -28,13 +28,18 @@ class UserService {
 
   async createUser(user: body, infoAdmin: infoAdmin) {
     try {
-      // const res_validate = await adminService.validateAdmin(infoAdmin);
-      // if (!res_validate.response.ok) return res_validate;
+      const res_validate = await adminService.validateAdmin(infoAdmin);
+
+      console.log(res_validate);
+
+      console.log(res_validate);
+      if (!res_validate.response.ok) return res_validate;
 
       const newFormat = {
         ...user,
         password: await bcrypt.hash(user.dni, 11),
       };
+      console.log(newFormat);
       await userSchema.create(newFormat);
       return httpService.http201("User created!");
     } catch (error) {
@@ -52,14 +57,19 @@ class UserService {
   async deleteUser(uuid: string, infoAdmin: infoAdmin) {
     try {
       // Validamos al administrador
-      // const res_validate = await adminService.validateAdmin(infoAdmin);
-      // if (!res_validate.response.ok) return res_validate;
+      const res_validate = await adminService.validateAdmin(infoAdmin);
+      if (!res_validate.response.ok) return res_validate;
+      console.log("res_validate");
+      console.log(res_validate);
       // Buscamos al usuario a eliminar
       const res_delete = await this.findUsersByUUID(uuid);
       if (!res_delete.response.ok) return res_delete;
+      console.log("res_delete");
+
+      console.log(res_delete);
       // Lo eliminamos
       await userSchema.deleteOne({ id: uuid });
-      httpService.http200("User deleted");
+      return httpService.http200("User deleted");
     } catch (error) {
       return httpService.http500(undefined, error);
     }
@@ -77,7 +87,7 @@ class UserService {
 
   async findUsersByUUID(uuid: string) {
     try {
-      const user = await userSchema.find({ id: uuid });
+      const user = await userSchema.findOne({ id: uuid });
       if (user) return httpService.http200("User found", user);
       return httpService.http404("User not found");
     } catch (error) {

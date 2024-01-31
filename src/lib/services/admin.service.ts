@@ -20,7 +20,7 @@ class AdminService {
 
   async findAdminByUUID(uuid: string) {
     try {
-      const admin = await userSchema.find({ id: uuid });
+      const admin = await userSchema.findOne({ id: uuid });
       if (!admin) return httpService.http404("Admin not found");
       return httpService.http200("Admin found", admin);
     } catch (error) {
@@ -50,15 +50,20 @@ class AdminService {
       const res_admin = await this.findAdminByUUID(data.uuid);
       if (!res_admin.response.ok) return res_admin;
       // Validamos si es admin
+      console.log(res_admin.response.data);
+      console.log(res_admin.response.data.role !== "admin");
       if (res_admin.response.data.role !== "admin")
-        return httpService.http401("No authorization");
+        return httpService.http401("No authorization in role");
+
       // Comparamos contraseñas
       const res_compare = await bcrypt.compare(
         data.password,
         res_admin.response.data.password
       );
+
       // mandamos error si no coinciden
-      if (!res_compare) return httpService.http401("No authorization");
+      if (!res_compare)
+        return httpService.http401("No authorization in password");
       // mandamos ok si es que pasa
       return httpService.http200("Admin authorization");
     } catch (error) {

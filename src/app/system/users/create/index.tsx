@@ -1,27 +1,41 @@
 "use client";
 
 import axios from "axios";
+import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 function CreateUser() {
   const [data, setData] = useState({ name: "", dni: "", password: "" });
-
   const [isLoading, setIsLoading] = useState(false);
-
   const [isError, setIsError] = useState(false);
+  const router = useRouter();
+
+  const { data: session } = useSession();
 
   async function handleSubmit(e: any) {
     e.preventDefault();
     if (data.name.length > 5 && data.dni.length === 8 && data.password) {
       setIsLoading(true);
       try {
-        await axios.post("/api/users", data);
-        redirect("/system/user");
+        const format = {
+          body: { name: data.name, dni: data.dni },
+          validation: {
+            uuid: session?.user.id,
+            password: data.password,
+          },
+        };
+        await axios.post("/api/users", format);
+        router.push("/system/users");
       } catch (error) {
+        console.log(error);
         settingError();
       }
-    } else settingError();
+    } else {
+      console.log("error second");
+      settingError();
+    }
   }
 
   function settingError() {
